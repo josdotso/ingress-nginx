@@ -95,6 +95,24 @@ http {
     geoip_city          /etc/nginx/geoip/GeoLiteCity.dat;
     geoip_org           /etc/nginx/geoip/GeoIPASNum.dat;
     geoip_proxy_recursive on;
+
+    {{ if $cfg.UseGeoIPCountryFilter }}
+    {{/* filter connections based on GeoIP country */}}
+    {{/* https://docs.nginx.com/nginx/admin-guide/security-controls/controlling-access-by-geoip/#complete-example */}}
+    map $geoip_country_code $allowed_country {
+        default {{ if $cfg.GeoIPCountryFilterDefaultDeny }}no{{ else }}yes{{ end }};
+        {{ range $GeoIPCountryFilterAllowList }}
+        {{ . }} yes;
+        {{ end }};
+        {{ range $GeoIPCountryFilterDenyList }}
+        {{ . }} no;
+        {{ end }};
+    }
+    if ($allowed_country = no) {
+        return $cfg.GeoIPCountryFilterDenyCode;
+    }
+    {{ end }}
+    {{ end }}
     {{ end }}
 
     {{ if $cfg.EnableVtsStatus }}

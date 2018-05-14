@@ -354,6 +354,29 @@ type Configuration struct {
 	// http://nginx.org/en/docs/http/ngx_http_geoip_module.html
 	UseGeoIP bool `json:"use-geoip,omitempty"`
 
+	// Enables or disables connection filtering by GeoIP country.
+        // https://docs.nginx.com/nginx/admin-guide/security-controls/controlling-access-by-geoip/#complete-example
+	// Default: false
+	UseGeoIPCountryFilter bool `json:"use-geoip-country-filter,omitempty"`
+
+	// Enables or disables the default deny policy for connection filtering by GeoIP country.
+        // https://docs.nginx.com/nginx/admin-guide/security-controls/controlling-access-by-geoip/#complete-example
+	// Default: false
+	GeoIPCountryFilterDefaultDeny bool `json:"use-geoip-country-filter-default-deny,omitempty"`
+
+	// Sets a list of GeoIP countries from which to allow connections.
+	// Default: empty
+	GeoIPCountryFilterAllowList []string `json:"geoip-country-filter-allow-list"`
+
+	// Sets a list of GeoIP countries from which to deny connections.
+	// Default: empty
+	GeoIPCountryFilterDenyList []string `json:"geoip-country-filter-deny-list"`
+
+	// Sets the return HTTP status code for connections denied due to GeoIP country filter.
+	// https://httpstatuses.com/444
+	// Default: 444
+	GeoIPCountryFilterDenyCode int `json:"geoip-country-filter-deny-code"`
+
 	// Enables or disables the use of the NGINX Brotli Module for compression
 	// https://github.com/google/ngx_brotli
 	EnableBrotli bool `json:"enable-brotli,omitempty"`
@@ -582,6 +605,11 @@ func NewDefault() Configuration {
 		EnableBrotli:               false,
 		UseGzip:                    true,
 		UseGeoIP:                   true,
+		UseGeoIPCountryFilter:      false,
+		GeoIPCountryFilterDefaultDeny: false,
+		GeoIPCountryFilterAllowList: []string{},
+		GeoIPCountryFilterDenyList: []string{},
+		GeoIPCountryFilterDenyCode: 444,
 		WorkerProcesses:            strconv.Itoa(runtime.NumCPU()),
 		WorkerShutdownTimeout:      "10s",
 		LoadBalanceAlgorithm:       defaultLoadBalancerAlgorithm,
